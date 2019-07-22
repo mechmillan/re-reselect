@@ -330,7 +330,7 @@ function testArrayArgument() {
   }
 }
 
-function testKeySelector() {
+function testKeySelectorOption() {
   type State = {foo: string; obj: {bar: string}};
 
   const selector = createCachedSelector(
@@ -345,29 +345,9 @@ function testKeySelector() {
   const selector2 = createCachedSelector(
     (state: State) => state.obj,
     obj => obj
-  )((state: never, obj) => obj);
-}
-
-function testSelectorCreatorOption() {
-  type State = {foo: string};
-
-  const selector1 = createCachedSelector(
-    (state: State) => state.foo,
-    foo => foo
-  )((state: State) => state.foo);
-
-  const selector2 = createCachedSelector(
-    (state: State) => state.foo,
-    foo => foo
-  )((state: State) => state.foo, {
-    selectorCreator: createSelectorCreator(defaultMemoize),
+  )({
+    keySelector: (state: never, obj) => obj,
   });
-
-  // typings:expect-error
-  const selectorFailing = createCachedSelector(
-    (state: State) => state.foo,
-    foo => foo
-  )((state: State) => state.foo, (): void => {});
 }
 
 function testKeySelectorCreatorOption() {
@@ -395,4 +375,16 @@ function testKeySelectorCreatorOption() {
   });
 
   const result: string = selector(state);
+}
+
+function testSelectorCreatorOption() {
+  type State = {foo: string};
+
+  const selector2 = createCachedSelector(
+    (state: State) => state.foo,
+    foo => foo
+  )({
+    keySelector: (state: State) => state.foo,
+    selectorCreator: createSelectorCreator(defaultMemoize),
+  });
 }
